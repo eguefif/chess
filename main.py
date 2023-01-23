@@ -19,4 +19,19 @@ while True:
     chessboard.print_interface()
     chessboard.draw_game()
     chessboard.print_dead_pieces()
-    move = input("Your move: ")
+    
+    while !True:
+        print(f"{chessboard.active_player.name}, it's your turn.")
+        current_position = input("Piece to move:  ")
+        target_position = input("To: ")
+        move_state = chessboard.move_piece(current_position, target_position)
+        if move_state == "success" or "mate":
+            break
+    
+    if move_state == "mate":
+        break
+
+print(f"The game is over. {chessboard.active_player.name} won.")
+
+
+    
