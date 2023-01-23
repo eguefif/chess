@@ -8,6 +8,12 @@ In checkboard move_piece function
 
 else we swtich the alive flag to 0 meaning it is dead
 
+How to check if the king is check mate?
+use the active set to see if a piece threaten a position
+write a function in each piece position that check is position is under thret return True or False
+Be carefull to take into account every position in the range of possible movement and if another piece is on the way.
+Shoudl I use a virtual board to check ?
+
 # Todo list:
 
    Think of a class GAME
