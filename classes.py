@@ -30,7 +30,7 @@ class Set():
                self.king,
                ]
 
-    def draw_pieces(self, board) -> None:
+    def draw_pieces(self, board: "Board") -> None:
         for pieces in self.set:
             for piece in pieces:
                 piece.draw(board)
@@ -40,7 +40,7 @@ class Piece:
     def __init__(self, color: str) -> None:
         self.color = color
    
-    def draw(self, board) -> None:
+    def draw(self, board: "Board") -> None:
        board.draw_piece(self.x, self.y, self.p, self.color)
 
 
