@@ -1,0 +1,34 @@
+# Todo:
+    Clear the terminal anytime the board is reprint.
+    Ask for names or randomize who play white.
+    Asking for a move commencing with white.
+    Move a piece and check if :
+        the move is possible (the player is not checked, inside the board and not on a friendly piece)
+    Think about how to print dead pieces
+
+class player
+     add a check status
+     add a color
+     add a name
+
+class Piece
+     add an active piece
+
+for each piece class
+     add a move method that replace the original position by an empty space
+    it return 'succes' when the move was possible, 'failure' when it failed
+
+class ChessBoard
+    add a move method that retrieve the object corresponding to the original position
+      arg:
+           x_origin, y_origin, x, y, player1, player2
+    if a move is a succes, check if a foe is on the ending cell and kill the foe
+    if it is a king, check and check for check mate
+    it it is a checkmate, return 'check mate' to end the game   
+    when it moved the piece, replace the original position by an empty space
+
+class king
+    add a check_for_check_mate method that check if the king can move, return yes or no
+
+class board
+    add a draw empty position
