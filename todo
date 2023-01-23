@@ -1,7 +1,7 @@
 # Todo:
-    Clear the terminal anytime the board is reprint.
-    Ask for names or randomize who play white.
-    Asking for a move commencing with white.
+   DONE Clear the terminal anytime the board is reprint.
+   DONE Ask for names or randomize who play white.
+   DONE  Asking for a move commencing with white.
     Move a piece and check if :
         the move is possible (the player is not checked, inside the board and not on a friendly piece)
     Think about how to print dead pieces

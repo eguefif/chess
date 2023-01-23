@@ -1,9 +1,12 @@
 from termcolor import colored
+import platform
+import os
+
 
 class ChessBoard:
-    def __init__(self, player_white: str, player_black: str) -> None:
-        self.player_white_name = player_white
-        self.player_black_name = player_black
+    def __init__(self, player1: "Player", player2: "player") -> None:
+        self.player1 = player1
+        self.player2 = player2
         self.white_set = Set("white")
         self.black_set = Set("black")
         self.board = Board()
@@ -14,21 +17,58 @@ class ChessBoard:
         self.board.print()
 
 
+    def print_interface(self):
+        if platform.system == "windows":
+            os.systen("cls")
+        else:
+            os.system("clear")
+
+        print(""*4, "Chess game")
+        print(f"White: {self.give_white_player_name()}")
+        print(f"Black: {self.give_black_player_name()}")
+
+    def print_dead_pieces(self):
+        print("Dead pieces:")
+        white_dead = self.white_set.return_dead_pieces()
+        black_dead = self.black_set.return_dead_pieces()
+        print("white", end=": ")
+        for piece in white_dead:
+            print(piece, end=' ')
+        print('')
+        print("black", end=": ")
+        for piece in black_dead:
+            print(piee, end=" ")
+        print('')
+
+    def give_white_player_name(self) -> None:
+        if self.player1.color == "White":
+            return self.player1.name
+        return self.player2.name
+
+    def give_black_player_name(self) -> None:
+        if self.player1.color == "Black":
+            return self.player1.name
+        return self.player2.name
+
 class Set():
     def __init__(self, color) -> None:
-       self.paws = [Pawn(color, a) for a in range(1, 9)]
-       self.rooks = [Rook(color, a) for a in range(2)]
-       self.bishops = [Bishop(color, a) for a in range(2)]
-       self.knights = [Knight(color, a) for a in range(2)]
-       self.queen = [Queen(color)]
-       self.king = [King(color)]
-       self.set = [self.paws,
+        self.paws = [Pawn(color, a) for a in range(1, 9)]
+        self.rooks = [Rook(color, a) for a in range(2)]
+        self.bishops = [Bishop(color, a) for a in range(2)]
+        self.knights = [Knight(color, a) for a in range(2)]
+        self.queen = [Queen(color)]
+        self.king = [King(color)]
+        self.set = [self.paws,
                self.rooks,
                self.bishops,
                self.knights,
                self.queen,
                self.king,
                ]
+    
+    def return_dead_pieces(self) -> list:
+        dead_pieces = [piece.name for subset in self.set for piece in subset if piece.alive == 0]
+        return dead_pieces
 
     def draw_pieces(self, board: "Board") -> None:
         for pieces in self.set:
@@ -37,15 +77,20 @@ class Set():
 
 
 class Piece:
+    x: int
+    y:int
     def __init__(self, color: str) -> None:
         self.color = color
+        self.alive = 1
    
     def draw(self, board: "Board") -> None:
        board.draw_piece(self.x, self.y, self.p, self.color)
 
 
 class Player:
-    pass
+    def __init__(self, name: str, color: str) -> None:
+        self.name = name
+        self.color = color
 
 
 class Pawn(Piece):
