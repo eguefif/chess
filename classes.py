@@ -18,7 +18,9 @@ class ChessBoard:
     def set_active_set(self) -> None:
         if self.active_player.color == "white":
             self.active_set = self.white_set
+            self.non_active_set = selt.black_set
         self.active_set = self.black_set
+        self.non_active_set = self.white_set
     
     def check_move_format(self, moves: [str]) -> bool:
         for move in moves:
@@ -28,9 +30,27 @@ class ChessBoard:
                 return False
         return True
 
+    def get_boards_with_pieces(self) -> list:
+        """This function return a 8*8 list with all the position marked with
+            -0 if empty
+            -1 for ally pieces
+            -2 for foes
+        """
+        board = [[0 for a in range(9)] for a in range(9)]
+
+        for subset in self.active_set:
+            for piece in subset:
+               board[piece.x][piece.y] = 1
+
+        for subet in self.non_active_set:
+            for piece in subset:
+                board[piece.x][piece.y] = 2
+        return board
+
+
     def move_piece(self, current_position: str, target_position: str) -> str:
         self.set_active_set()
-        if !self.check_move_format([target_position, current_position]):
+        if self.check_move_format([target_position, current_position]) == False:
             return
         
         x_current, y_current = self.get_xy_position(current_position)
@@ -46,19 +66,20 @@ class ChessBoard:
                 return
         
         x_target, y_target = self.get_xy_position(target_position)
-        move_state = piece.is_move_possible(x, y)
+        board = self.get_boars_with_pieces()
+        move_state = piece.is_move_possible(x, y, board)
         if move_state != "success":
             print("This move is not authorized")
 
         kill = self.check_for_kill(x_target, y_target)
-        if kill.name == "z":
-            if kill.is_check_mate():
-                return "mate"
-            else:
-                self.get_non_active_player().check = True
-                self.switch_active_player()
-                return "success"
         if isinstance(kill, Piece):
+            if kill.name == "z":
+                if kill.is_check_mate():
+                    return "mate"
+                else:
+                    self.get_non_active_player().check = True
+                    self.switch_active_player()
+                    return "success"
             kill.alive = 0
         
         piece.move(x, y)
@@ -66,7 +87,7 @@ class ChessBoard:
         self.switch_active_player()
         return "success"
 
-    def get_non_active_player(self) -> Player:
+    def get_non_active_player(self) -> "Player":
         if self.active_player == self.player1:
             return self.player2
         else:
@@ -78,10 +99,10 @@ class ChessBoard:
         else:
             self.active_player = self.player1
 
-    def get_piece(self, x: int, y: int) -> Piece:
+    def get_piece(self, x: int, y: int) -> "Piece":
         for subset in self.active_set.set:
             for piece in subset:
-                if piece.x = x and piece.y = y:
+                if piece.x == x and piece.y == y:
                     return piece
         return None
 
@@ -127,6 +148,19 @@ class ChessBoard:
         for piece in black_dead:
             print(piee, end=" ")
         print('')
+    
+    def check_for_kill(self, x: int, y: int) -> Piece:
+        board = self.get_board_with_pieces()
+        if board[x][y] == 2:
+            return self.get_piece_by_position(x, y)
+
+
+   def get_piece_by_position(self, x: int, y: int) -> piece:
+       for subset in self.white_set.set:
+           for piece in subset:
+               if piece.x == x and piece.y == y:
+                   return piece
+
 
     def give_white_player_name(self) -> None:
         if self.player1.color == "White":
@@ -181,6 +215,8 @@ class Piece:
     def move(self, x: int, y:int) -> None:
         self.x = x
         self.y = y
+
+
 class Player:
     def __init__(self, name: str, color: str) -> None:
         self.name = name
@@ -198,6 +234,31 @@ class Pawn(Piece):
         else:
             self.y = 2
 
+    def is_move_possible(self, x: int, y: int, board: list) -> bool:
+        possible_move = []
+        if super().color == 'black':
+            y_direction = -1
+        ele:
+            y_direction = 1
+
+        if self.y+y_direction*1 >0:
+            if board[self.x][self.y+1*y_direction] == 0:
+                 possible_move.append((self.x, self.y+y_direction*1))
+        if self.y+y_direction*2>2:
+            if board[self.x][self.y+y_direction*2] == 0:
+                possible_move.append((self.x, self.y+y_direction*2))
+        if self.x+1<9 and self.y+y_direction*1>0:
+            if board[self.x+1][self.y+y_direction*1] == 2:
+                possible_move.append((self.x+1, self.y+y_direction*1))
+        if self.x-1>0 and self.y+y_direction*2>1:
+            if board[self.x-1][self.y+y_direction*1]:
+                possible_move.append
+
+        if (x, y) in possible_move:
+            return true
+        return False
+
+
 class Rook(Piece):
     def __init__(self, color: str, position: int) -> None:
         super().__init__(color)
@@ -211,6 +272,28 @@ class Rook(Piece):
         else:
             self.y = 1
 
+    def is_move_possible(self, x: int, y: int, board: list) -> bool:
+        if x - self.x == 0:
+            if y > self.y:
+                for y_check in range(self.y, y):
+                    if board[x][y_check] != 0:
+                        return False
+            if y < self.y:
+                for y_check in range(self.y, y, -1):
+                    if board[x][y_check] != 0:
+                        return False
+
+        if y - self.y == 0:
+            if x > self.x:
+                for x_check in range(self.x, x):
+                    if board[x_check][y] != 0:
+                        return False
+            if x < self.x:
+                for x_check in range(self.x, x, -1):
+                    if board[x_check][y] != 0:
+                        return False
+
+        return False
 
 class Bishop(Piece):
     def __init__(self, color: str, position: int) -> None:
@@ -238,6 +321,24 @@ class Knight(Piece):
             self.y = 8
         else:
             self.y = 1
+
+    def is_move_possible(sefl, x: int, y:int, board: list) -> bool:
+        possible_move = [(self.x-1, self.y+2),
+                (self.x+1, self.y+2),
+                (self.x-1, self.y-2),
+                (self.x+1, self.y-2),
+                ]
+
+        check_position = list(range(9))
+        for position, key in enumerate(possible_move):
+            if position[0] not in check_position or position[1] not in check_position:
+                possible_moves.pop(key)
+            if board[position[0]][position[1] == 1:
+                possible_moves.pop(key)
+
+        if (x, y) in possible_moves:
+            return True
+        return False
 
 
 class Queen(Piece):
@@ -297,4 +398,4 @@ class Board():
         self.draw(x, y, ' ')
 
     def draw(self, x: int, y: int, value: str) -> None:
-        self.board[y_1][x*2] = value
+        self.board[y+1][x*2] = value

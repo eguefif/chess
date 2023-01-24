@@ -1,18 +1,13 @@
 # Next todo :
-For each piece, make a is_move_possible fuction return True or False
-In class Piece add a method named is_move_on_the_board return True or False
+Do the is_move_possible for :
+-bishop
+-queen: copy paster bishop and rook
+-King
 
-
-In checkboard move_piece function
--add method check_for_kill that check if there is a piece on the target position
-
-else we swtich the alive flag to 0 meaning it is dead
-
-How to check if the king is check mate?
-use the active set to see if a piece threaten a position
-write a function in each piece position that check is position is under thret return True or False
-Be carefull to take into account every position in the range of possible movement and if another piece is on the way.
-Shoudl I use a virtual board to check ?
+Do the is_check_mate function return bool
+define a function that return king moves possibility
+define a fuction that return every king moves possibility after removing those that have ally piece
+use every piece is_move_possible on every king move possibility
 
 # Todo list:
 
