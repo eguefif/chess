@@ -210,7 +210,7 @@ class Piece:
             board.draw_piece(self.x, self.y, self.p, self.color)
 
     def is_move_possible(self, x: int, y: int) -> bool:
-        ...
+        pass
 
     def move(self, x: int, y:int) -> None:
         self.x = x
@@ -293,7 +293,7 @@ class Rook(Piece):
                     if board[x_check][y] != 0:
                         return False
 
-        return False
+        return True
 
 class Bishop(Piece):
     def __init__(self, color: str, position: int) -> None:
@@ -308,6 +308,25 @@ class Bishop(Piece):
         else:
             self.y = 1
 
+    def is_move_possible(self, x: int, y: int, board: list) -> bool:
+        possible_moves = []
+        for x_check, y_check in zip(range(x.self, 9), range(y.self, 9)):
+            possible_moves.append(x_check, y_check)
+        for x_check, y_check in zip(range(x.self, 0, -1), range(y.self, 9)):
+            possible_moves.append(x_check, y_check)
+        for x_check, ycheck in zip(range(x.self, 0, -1), range(y.self, 0, -1)):
+            possible_moves.append(x_check, y_check)
+        for x_check, y_check in zip(range(x.self, 9), range(y.self, 0, -1)):
+            possible_moves.append(x_check, y_check)
+
+        if (x, y) not in possible_moves:
+            return False
+
+        for x_check, y_check in zip(range(self.x, x), range(self.y, y)):
+            if board(x_check, y_check) != 0:
+                return False
+            
+        return True
 
 class Knight(Piece):
     def __init__(self, color: str, position: int) -> None:
@@ -327,6 +346,11 @@ class Knight(Piece):
                 (self.x+1, self.y+2),
                 (self.x-1, self.y-2),
                 (self.x+1, self.y-2),
+                (self.x+2, self.y-1),
+                (self.x-2, self.y-1),
+                (self.x-2, self.y+1),
+                (self.x+2, self.y+1),
+                (self.x+2, self.y-2),
                 ]
 
         check_position = list(range(9))
@@ -342,7 +366,7 @@ class Knight(Piece):
 
 
 class Queen(Piece):
-    def __init__(self, color: str, ) -> None:
+    def __init__(self, color: str ) -> None:
         super().__init__(color)
         self.p = 'Q'
         self.x = 4
@@ -350,6 +374,27 @@ class Queen(Piece):
             self.y = 8
         else:
             self.y = 1
+
+    def is_move_possible(self, x: int, y: int, board: list) -> bool:
+        possible_moves = []
+        
+        for x_check, y_check in zip(range(x.self, 9), range(y.self, 9)):
+            possible_moves.append(x_check, y_check)
+        for x_check, y_check in zip(range(x.self, 0, -1), range(y.self, 9)):
+            possible_moves.append(x_check, y_check)
+        for x_check, ycheck in zip(range(x.self, 0, -1), range(y.self, 0, -1)):
+            possible_moves.append(x_check, y_check)
+        for x_check, y_check in zip(range(x.self, 9), range(y.self, 0, -1)):
+            possible_moves.append(x_check, y_check)
+        
+        for y_check in range(1, 9):
+            possible_moves.append((self.x, y))
+        for x_check in range(1, 9):
+            possible_moves.append((x_check, y))
+
+        if (x, y) not in possible_moves:
+            return False
+        
 
 
 class King(Piece):

@@ -1,10 +1,13 @@
 # Next todo :
 Do the is_move_possible for :
--bishop
 -queen: copy paster bishop and rook
+      Finish to check the board between her and the target position, first check the kind of move and then do everything
 -King
 
-Do the is_check_mate function return bool
+
+Do the is_check_mate function return boo
+
+
 define a function that return king moves possibility
 define a fuction that return every king moves possibility after removing those that have ally piece
 use every piece is_move_possible on every king move possibility
