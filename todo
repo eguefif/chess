@@ -1,9 +1,5 @@
 # Next todo :
-Do the is_move_possible for :
--queen: copy paster bishop and rook
-      Finish to check the board between her and the target position, first check the kind of move and then do everything
--King
-
+Check if the player is playing its pieces.
 
 Do the is_check_mate function return boo
 
