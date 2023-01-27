@@ -24,13 +24,13 @@ class ChessBoard:
 
     def check_move_format(self, moves: [str]) -> bool:
         for move in moves:
-            if move[0] not in range(1, 9):
+            if move[1] not in range(1, 9):
                 return False
-            if move[1] not in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
+            if move[0] not in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
                 return False
         return True
 
-    def get_boards_with_pieces(self) -> list:
+    def get_board_with_pieces(self) -> list:
         """This function return a 8*8 list with all the position marked with
             -0 if empty
             -1 for ally pieces
@@ -66,13 +66,13 @@ class ChessBoard:
                 return
 
         x_target, y_target = self.get_xy_position(target_position)
-        board = self.get_boars_with_pieces()
+        board = self.get_board_with_pieces()
         move_state = piece.is_move_possible(x_target, y_target, board)
         if move_state != "success":
             print("This move is not authorized")
 
         kill = self.check_for_kill(x_target, y_target)
-        if isinstance(kill, Piece):
+        if kill is True:
             if kill.name == "z":
                 if kill.is_check_mate():
                     return "mate"
@@ -80,9 +80,9 @@ class ChessBoard:
                     self.get_non_active_player().check = True
                     self.switch_active_player()
                     return "success"
-            kill.alive = 0
+            self.non_active_set.kill_piece(x_target, y_target)
 
-        piece.move(x_target, y_target)
+        self.active_set.move_piece(x_current, x_current, x_target, y_target)
         self.board.draw_empty_position(x_current, y_current)
         self.switch_active_player()
         return "success"
@@ -116,8 +116,8 @@ class ChessBoard:
                            'g': 7,
                            'h': 8,
                            }
-        y_position = letter_position.get(position[1])
-        return int(position[0]), y_position
+        x_position = letter_position.get(position[1])
+        return (x_position, int(position[1]))
 
     def draw_game(self):
         self.white_set.draw_pieces(self.board)
@@ -184,6 +184,18 @@ class Set():
                     self.queen,
                     self.king,
                     ]
+
+    def move_piece(self, x, y, x_target, y_target):
+        for subset in self.set:
+            for piece in subset:
+                if piece.x == x and piece.y == y:
+                    piece.move(x_target, y_target)
+
+    def kill_piece(self, x: int, y: int) -> None:
+        for subset in self.set:
+            for piece in subset:
+                if piece.x == x and piece.y == y:
+                    piece.alive = 0
 
     def return_dead_pieces(self) -> list:
         dead_pieces = [piece.name for subset in self.set
@@ -254,7 +266,7 @@ class Pawn(Piece):
                 possible_move.append
 
         if (x, y) in possible_move:
-            return True
+            return "success"
         return False
 
 
@@ -292,7 +304,7 @@ class Rook(Piece):
                     if board[x_check][y] != 0:
                         return False
 
-        return True
+        return "success"
 
 
 class Bishop(Piece):
@@ -325,7 +337,7 @@ class Bishop(Piece):
         for x_check, y_check in zip(range(self.x, x), range(self.y, y)):
             if board[x_check][y_check] != 0:
                 return False
-        return True
+        return "success"
 
 
 class Knight(Piece):
@@ -362,7 +374,7 @@ class Knight(Piece):
                 possible_moves.pop(key)
 
         if (x, y) in possible_moves:
-            return True
+            return "success"
         return False
 
 
@@ -416,7 +428,7 @@ class Queen(Piece):
         for x_check, y_check in zip(range(self.x, x), range(self.y, y)):
             if board[x_check][y_check] != 0:
                 return False
-        return True
+        return "success"
 
 
 class King(Piece):
@@ -448,12 +460,12 @@ class King(Piece):
 
         if board[x][y] == 1:
             return False
-        return True
+        return "success"
 
 
 class Board():
     def __init__(self) -> None:
-        self.board = [['  ', 'a', ' ', 'b', ' ', 'c', ' ', 'd', ' ', 'e', ' ', 'f', ' ', 'g', 'h'],
+        self.board = [['  ', 'a', ' ', 'b', ' ', 'c', ' ', 'd', ' ', 'e', ' ', 'f', ' ', 'g', ' ', 'h'],
                       ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',],
                       ['1', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', '1'],
                       ['2', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', '2'],
@@ -464,7 +476,7 @@ class Board():
                       ['7', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', '7'],
                       ['8', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', '8'],
                       ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',],
-                      ['  ', 'a', ' ', 'b', ' ', 'c', ' ', 'd', ' ', 'e', ' ', 'f', ' ', 'g', 'h'],
+                      ['  ', 'a', ' ', 'b', ' ', 'c', ' ', 'd', ' ', 'e', ' ', 'f', ' ', 'g', ' ', 'h'],
                       ]
 
     def print(self):
