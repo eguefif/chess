@@ -1,5 +1,6 @@
 from termcolor import colored
 import platform
+import string
 import os
 
 
@@ -19,14 +20,32 @@ class ChessBoard:
         if self.active_player.color == "white":
             self.active_set = self.white_set
             self.non_active_set = self.black_set
+            return 
         self.active_set = self.black_set
         self.non_active_set = self.white_set
 
     def check_move_format(self, moves: [str]) -> bool:
+        letters = string.ascii_lowercase[:8] + string.ascii_uppercase[:8]
         for move in moves:
-            if move[1] not in range(1, 9):
+            try:
+                if len(move) != 2:
+                    return False
+            except TypeError:
+                    print("Wrong position format")
+                    return False
+            if move[0] in letters:
+                y = move[0]
+                x = move[1]
+            else:
+                y = move[1]
+                x = move[0]
+            try:
+                if int(x) not in range(1, 9):
+                    return False
+            except ValueError as ex:
+                print("Wrong position format")
                 return False
-            if move[0] not in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']:
+            if y not in letters:
                 return False
         return True
 
@@ -36,31 +55,30 @@ class ChessBoard:
             -1 for ally pieces
             -2 for foes
         """
-        board = [[0 for a in range(9)] for a in range(9)]
-
-        for subset in self.active_set:
+        board = [[0 for a in range(8)] for a in range(8)]
+        for subset in self.active_set.set:
             for piece in subset:
-                board[piece.x][piece.y] = 1
+                board[piece.x-1][piece.y-1] = 1
 
-        for subet in self.non_active_set:
+        for subset in self.non_active_set.set:
             for piece in subset:
-                board[piece.x][piece.y] = 2
+                board[piece.x-1][piece.y-1] = 2
         return board
 
     def move_piece(self, current_position: str, target_position: str) -> str:
         self.set_active_set()
         if self.check_move_format(
                 [target_position, current_position]) is False:
-            return
+            print('The target position is not valid.')
+            return False
 
         x_current, y_current = self.get_xy_position(current_position)
         piece = self.get_piece(x_current, y_current)
-
         if piece is None:
             print(f"There is not piece on {current_position}.")
             return
 
-        if set.active_player.check is True:
+        if self.active_player.check is True:
             if piece.p != "z":
                 print("Your king is in check, move it.")
                 return
@@ -70,6 +88,7 @@ class ChessBoard:
         move_state = piece.is_move_possible(x_target, y_target, board)
         if move_state != "success":
             print("This move is not authorized")
+            return
 
         kill = self.check_for_kill(x_target, y_target)
         if kill is True:
@@ -79,10 +98,10 @@ class ChessBoard:
                 else:
                     self.get_non_active_player().check = True
                     self.switch_active_player()
-                    return "success"
+                    return "check"
             self.non_active_set.kill_piece(x_target, y_target)
 
-        self.active_set.move_piece(x_current, x_current, x_target, y_target)
+        self.active_set.move_piece(x_current, y_current, x_target, y_target)
         self.board.draw_empty_position(x_current, y_current)
         self.switch_active_player()
         return "success"
@@ -103,6 +122,8 @@ class ChessBoard:
         for subset in self.active_set.set:
             for piece in subset:
                 if piece.x == x and piece.y == y:
+                    if piece.alive == 0:
+                        return None
                     return piece
         return None
 
@@ -116,7 +137,7 @@ class ChessBoard:
                            'g': 7,
                            'h': 8,
                            }
-        x_position = letter_position.get(position[1])
+        x_position = letter_position.get(position[0])
         return (x_position, int(position[1]))
 
     def draw_game(self):
@@ -159,12 +180,12 @@ class ChessBoard:
                     return piece
 
     def give_white_player_name(self) -> None:
-        if self.player1.color == "White":
+        if self.player1.color == "white":
             return self.player1.name
         return self.player2.name
 
     def give_black_player_name(self) -> None:
-        if self.player1.color == "Black":
+        if self.player1.color == "black":
             return self.player1.name
         return self.player2.name
 
@@ -205,6 +226,8 @@ class Set():
     def draw_pieces(self, board: "Board") -> None:
         for pieces in self.set:
             for piece in pieces:
+                if piece.alive == 0:
+                    break
                 piece.draw(board)
 
 
@@ -240,6 +263,7 @@ class Pawn(Piece):
         super().__init__(color)
         self.p = 'p'
         self.x = position
+        self.first_move = 1
         if color == "black":
             self.y = 7
         else:
@@ -247,25 +271,31 @@ class Pawn(Piece):
 
     def is_move_possible(self, x: int, y: int, board: list) -> bool:
         possible_move = []
-        if super().color == 'black':
+        if self.color == 'black':
             y_direction = -1
         else:
             y_direction = 1
+        for row in board:
+            for c in row:
+                print(c, ' ', end='')
+            print()
 
-        if self.y+y_direction*1 > 0:
-            if board[self.x][self.y+1*y_direction] == 0:
+        if self.y+y_direction*1 in range(9) :
+            if board[self.x-1][self.y-1+1*y_direction] == 0:
                 possible_move.append((self.x, self.y+y_direction*1))
-        if self.y+y_direction*2 > 2:
-            if board[self.x][self.y+y_direction*2] == 0:
+        if self.y+y_direction*2 in range(9) and self.first_move == 1:
+            if board[self.x-1][self.y-1+y_direction*2] == 0:
                 possible_move.append((self.x, self.y+y_direction*2))
-        if self.x+1 < 9 and self.y+y_direction*1 > 0:
-            if board[self.x+1][self.y+y_direction*1] == 2:
+        if self.x+1 in range(9) and self.y+y_direction*1 in range(9):
+            if board[self.x-1+1][self.y-1+y_direction*1] == 2:
                 possible_move.append((self.x+1, self.y+y_direction*1))
-        if self.x-1 > 0 and self.y+y_direction*2 > 1:
-            if board[self.x-1][self.y+y_direction*1]:
-                possible_move.append
+        if self.x-1 in range(9) and self.y+y_direction*1 in range(9):
+            if board[self.x-1-1][self.y-1+y_direction*1] == 2:
+                possible_move.append((self.x-1, self.y+y_direction*1))
+        print(possible_move)
 
         if (x, y) in possible_move:
+            self.first_move = 0
             return "success"
         return False
 
