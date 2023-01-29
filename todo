@@ -1,12 +1,7 @@
 # Next todo :
-Check if the player is playing its pieces.
-
 Do the is_check_mate function return boo
 
 
-define a function that return king moves possibility
-define a fuction that return every king moves possibility after removing those that have ally piece
-use every piece is_move_possible on every king move possibility
 
 # Todo list:
 
@@ -20,7 +15,3 @@ use every piece is_move_possible on every king move possibility
    IN PROCESS Move a piece and check if :
         the move is possible (the player is not checked, inside the board and not on a friendly piece)
    DONE Think about how to print dead pieces
-
-
-
-
