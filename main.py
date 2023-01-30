@@ -1,6 +1,7 @@
 from classes import ChessBoard, Player
 import random
 
+
 print("Welcome to chess")
 player1_name = input("What is the name of the first player: ")
 player2_name = input("What is the name of the second player: ")
@@ -24,7 +25,15 @@ while True:
         print(f"{chessboard.active_player.name}, it's your turn.")
         current_position = input("Piece to move:  ")
         target_position = input("To: ")
-        move_state = chessboard.move_piece(current_position, target_position)
+        if (chessboard.check_move_format(target_position) and
+        chessboard.check_move_format(current_position)):
+            x_current, y_current = chessboard.get_xy_position(current_position)
+            x_target, y_target = chessboard.get_xy_position(target_position)
+            move_state = chessboard.move_piece(x_current,
+                    y_current,
+                    x_target,
+                    y_target,
+                    )
         if move_state in ["success", "mate", "check"]:
             input("Push any key to refresh.")
             break
@@ -32,4 +41,4 @@ while True:
     if move_state == "mate":
         break
 
-print(f"The game is over. {chessboard.active_player.name} won.")
+print(f"The game is over, {chessboard.active_player.name} won.")
