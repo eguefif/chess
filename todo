@@ -1,10 +1,15 @@
 # Next todo :
-Do the is_check_mate function return boo
-
-
+- Test Rook
 
 # Todo list:
 
+
+- Test Bishop
+- Test Queen
+- Test King
+
+Implement castling
+Do the is_check_mate function return boo
    Think of a class GAME
      -It would handle the main loop
      - It would handle the get move loop

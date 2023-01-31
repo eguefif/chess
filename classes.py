@@ -33,7 +33,7 @@ class ChessBoard:
                 return
         except TypeError:
             print("Wrong position format.")
-            return 
+            return
         if move[0] in letters:
             y = move[0]
             x = move[1]
@@ -49,7 +49,7 @@ class ChessBoard:
         if y not in letters:
             print("You need a letter from a to h.")
             return
-        return f'{y}{x}' 
+        return f'{y}{x}'
 
     def get_board_with_pieces(self) -> list:
         """This function return a 8*8 list with all the position marked with
@@ -85,16 +85,14 @@ class ChessBoard:
                 print("Your king is in check, move it.")
                 return 'failed'
 
-
         board = self.get_board_with_pieces()
         move_state = piece.is_move_possible(x_target, y_target, board)
         if move_state != "success":
             print("This move is not authorized")
             return 'failed'
 
-
         kill = self.check_for_kill(x_target, y_target)
-        if kill is True:
+        if isinstance(kill, Piece):
             if kill.name == "z":
                 if kill.is_check_mate():
                     return "mate"
@@ -119,7 +117,7 @@ class ChessBoard:
             self.active_player = self.player1
 
     def get_piece_if_alive(self, x: int, y: int) -> "Piece":
-        piece = self.get_piece_by_position(x, y);
+        piece = self.get_piece_by_position(x, y)
         if piece:
             if piece.alive == 0:
                 return None
@@ -170,9 +168,10 @@ class ChessBoard:
         print('')
 
     def check_for_kill(self, x: int, y: int) -> "Piece":
-        board = self.get_board_with_pieces()
-        if board[x][y] == 2:
-            return self.get_piece_by_position(x, y)
+        for subset in self.non_active_set.set:
+            for piece in subset:
+                if piece.x == x and piece.y == y:
+                    return piece
 
     def get_piece_by_position(self, x: int, y: int) -> "Piece":
         for subset in self.active_set.set:
@@ -218,6 +217,7 @@ class Set():
             for piece in subset:
                 if piece.x == x and piece.y == y:
                     piece.alive = 0
+                    piece.move(-1, -1)
 
     def return_dead_pieces(self) -> list:
         dead_pieces = [piece.name for subset in self.set
@@ -235,6 +235,7 @@ class Set():
 class Piece:
     x: int
     y: int
+    name: str
 
     def __init__(self, color: str) -> None:
         self.color = color
@@ -242,7 +243,7 @@ class Piece:
 
     def draw(self, board: "Board") -> None:
         if self.alive == 1:
-            board.draw_piece(self.x, self.y, self.p, self.color)
+            board.draw_piece(self.x, self.y, self.name, self.color)
 
     def is_move_possible(self, x: int, y: int) -> bool:
         pass
@@ -262,7 +263,7 @@ class Player:
 class Pawn(Piece):
     def __init__(self, color: str, position: int) -> None:
         super().__init__(color)
-        self.p = 'p'
+        self.name = 'p'
         self.x = position
         self.first_move = 1
         if color == "black":
@@ -298,7 +299,7 @@ class Pawn(Piece):
 class Rook(Piece):
     def __init__(self, color: str, position: int) -> None:
         super().__init__(color)
-        self.p = 'R'
+        self.name = 'R'
         if position == 0:
             self.x = 1
         else:
@@ -335,7 +336,7 @@ class Rook(Piece):
 class Bishop(Piece):
     def __init__(self, color: str, position: int) -> None:
         super().__init__(color)
-        self.p = 'B'
+        self.name = 'B'
         if position == 0:
             self.x = 3
         else:
@@ -368,7 +369,7 @@ class Bishop(Piece):
 class Knight(Piece):
     def __init__(self, color: str, position: int) -> None:
         super().__init__(color)
-        self.p = 'K'
+        self.name = 'K'
         if position == 0:
             self.x = 2
         else:
@@ -406,7 +407,7 @@ class Knight(Piece):
 class Queen(Piece):
     def __init__(self, color: str) -> None:
         super().__init__(color)
-        self.p = 'Q'
+        self.name = 'Q'
         self.x = 4
         if color == "black":
             self.y = 8
@@ -460,7 +461,7 @@ class King(Piece):
     def __init__(self, color: str, ) -> None:
         super().__init__(color)
         self.x = 5
-        self.p = 'Z'
+        self.name = 'Z'
         if color == "black":
             self.y = 8
         else:
