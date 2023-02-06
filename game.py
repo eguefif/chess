@@ -26,6 +26,7 @@ class Game():
             return False
         if len(player2) > 20:
             print("Player 2's name is too long.")
+            return False
         self.player2_name = player2
         return True
 

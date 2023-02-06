@@ -77,7 +77,7 @@ class ChessBoard:
 
         piece = self.get_piece_if_alive(x_current, y_current)
         if piece is None:
-            print("There is not piece.")
+            print("There is no piece.")
             return 'failed'
 
         if self.active_player.check is True:
@@ -89,6 +89,10 @@ class ChessBoard:
         move_state = piece.is_move_possible(x_target, y_target, board)
         if move_state != "success":
             print("This move is not authorized")
+            return 'failed'
+
+        if self.is_target_ally(x_target, y_target):
+            print("This move is not authorized.")
             return 'failed'
 
         kill = self.check_for_kill(x_target, y_target)
@@ -106,6 +110,12 @@ class ChessBoard:
         self.board.draw_empty_position(x_current, y_current)
         self.switch_active_player()
         return "success"
+
+    def is_target_ally(self,x: int, y: int) -> bool:
+        board = self.get_board_with_pieces()
+        if board[x-1][y-1] == 1:
+            return 1
+        return 0
 
     def get_non_active_player(self) -> "Player":
         return self.active_player
@@ -173,7 +183,6 @@ class ChessBoard:
                 if piece.x == x and piece.y == y:
                     return piece
 
-    def get_piece_by_position(self, x: int, y: int) -> "Piece":
         for subset in self.active_set.set:
             for piece in subset:
                 if piece.x == x and piece.y == y:
@@ -189,6 +198,15 @@ class ChessBoard:
             return self.player1.name
         return self.player2.name
 
+    def get_piece_by_position(self, x, y):
+        for subset in self.white_set.set:
+            for piece in subset:
+                if piece.x == x and piece.y == y:
+                    return piece
+        for subset in self.black_set.set:
+            for piece in subset:
+                if piece.x == x and piece.y == y:
+                    return piece
 
 class Set():
     def __init__(self, color) -> None:
@@ -237,6 +255,9 @@ class Piece:
     y: int
     name: str
 
+    def check_board(self, x: int, y: int, board: [int, int]) -> int:
+        return board[x-1][y-1]
+
     def __init__(self, color: str) -> None:
         self.color = color
         self.alive = 1
@@ -282,6 +303,7 @@ class Pawn(Piece):
                 possible_move.append((self.x, self.y+y_direction*1))
         if self.y+y_direction*2 in range(9) and self.first_move == 1:
             if board[self.x-1][self.y-1+y_direction*2] == 0:
+                self.first_move = 0
                 possible_move.append((self.x, self.y+y_direction*2))
         if self.x+1 in range(9) and self.y+y_direction*1 in range(9):
             if board[self.x-1+1][self.y-1+y_direction*1] == 2:
@@ -312,22 +334,23 @@ class Rook(Piece):
     def is_move_possible(self, x: int, y: int, board: list) -> bool:
         if x - self.x == 0:
             if y > self.y:
-                for y_check in range(self.y, y):
-                    if board[x][y_check] != 0:
+                for y_check in range(self.y+1, y):
+                    if super().check_board(x, y_check, board) != 0:
                         return False
             if y < self.y:
-                for y_check in range(self.y, y, -1):
-                    if board[x][y_check] != 0:
+                for y_check in range(self.y-1, y, -1):
+                    if  super().check_board(x, y_check, board) != 0:
+                        print(x, y_check, board[x][y_check])
                         return False
 
         if y - self.y == 0:
             if x > self.x:
-                for x_check in range(self.x, x):
-                    if board[x_check][y] != 0:
+                for x_check in range(self.x+1, x):
+                    if super().check_board(x_check, y, board) != 0:
                         return False
             if x < self.x:
-                for x_check in range(self.x, x, -1):
-                    if board[x_check][y] != 0:
+                for x_check in range(self.x-1, x, -1):
+                    if  super().check_board(x_check, y, board) != 0:
                         return False
 
         return "success"
@@ -347,22 +370,28 @@ class Bishop(Piece):
             self.y = 1
 
     def is_move_possible(self, x: int, y: int, board: list) -> bool:
-        possible_moves = []
-        for x_check, y_check in zip(range(x.self, 9), range(y.self, 9)):
-            possible_moves.append(x_check, y_check)
-        for x_check, y_check in zip(range(x.self, 0, -1), range(y.self, 9)):
-            possible_moves.append(x_check, y_check)
-        for x_check, ycheck in zip(range(x.self, 0, -1), range(y.self, 0, -1)):
-            possible_moves.append(x_check, y_check)
-        for x_check, y_check in zip(range(x.self, 9), range(y.self, 0, -1)):
-            possible_moves.append(x_check, y_check)
-
-        if (x, y) not in possible_moves:
+        if abs(self.x - x) != abs(self.y - y):
             return False
+        if self.x - x > 0 and self.y - y > 0:
+            for x_check, y_check in zip(range(self.x-1, x, -1), range(self.y-1, y, -1)):
+                    if board[x_check-1][y_check-1] != 0:
+                        return False
+        if self.x - x < 0 and self.y - y > 0:
+            for x_check, y_check in zip(range(self.x+1, x), range(self.y-1, y, -1)):
+                if board[x_check-1][y_check-1] != 0:
+                    return False
+        if self.x - x < 0 and self.y - y < 0:
+            for x_check, y_check in zip(range(self.x+1, x), range(self.y+1, y)):
+                if board[x_check-1][y_check-1] != 0:
+                    return False
+        if self.x - x > 0 and self.y - y < 0:
+            for x_check, y_check in zip(range(self.x-1, x, -1), range(self.y+1, y)):
+                if board[x_check][y_check] != 0:
+                    print('test')
+                    return False
 
-        for x_check, y_check in zip(range(self.x, x), range(self.y, y)):
-            if board[x_check][y_check] != 0:
-                return False
+        if board[x-1][y-1] == 1:
+            return False
         return "success"
 
 
@@ -380,28 +409,24 @@ class Knight(Piece):
             self.y = 1
 
     def is_move_possible(self, x: int, y: int, board: list) -> bool:
-        possible_moves = [(self.x-1, self.y+2),
-                          (self.x+1, self.y+2),
-                          (self.x-1, self.y-2),
-                          (self.x+1, self.y-2),
-                          (self.x+2, self.y-1),
+        possible_moves = [(self.x-1, self.y-2),
                           (self.x-2, self.y-1),
                           (self.x-2, self.y+1),
+                          (self.x-1, self.y+2),
+                          (self.x+1, self.y+2),
                           (self.x+2, self.y+1),
-                          (self.x+2, self.y-2),
+                          (self.x+2, self.y-1),
+                          (self.x+1, self.y-2),
                           ]
-
-        check_position = list(range(9))
-        for position, key in enumerate(possible_moves):
-            if (position[0] not in check_position or
-                position[1] not in check_position):
-                possible_moves.pop(key)
-            if board[position[0]][position[1]] == 1:
-                possible_moves.pop(key)
-
-        if (x, y) in possible_moves:
-            return "success"
-        return False
+        if board[x-1][y-1] == 1:
+            print('test')
+            return "failed"
+        if (x, y) not in possible_moves:
+            return "failed"
+        return "success"
+    
+    def __repr__(self):
+        return f"Knight {self.color} on {self.x}{self.y}."
 
 
 class Queen(Piece):

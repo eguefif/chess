@@ -1,10 +1,20 @@
 # Next todo :
-- Test Rook
+- test bishop: kill and illegal moves
 
 # Todo list:
+## Change in design
+The chessboard won't be responsable for the call to board and painting.
+Instead, it will send a two dimensonal array of the board with piece objects.
+It will raise exceptions when move are not possible or there is a mistake.
+Here are a list of method:
+- Forbiden moves
+- No piece on current position
+- Player checked
+- check mate
+
+Then game facade will be responsible to call the board classe that I will rename terminal_board.
 
 
-- Test Bishop
 - Test Queen
 - Test King
 
