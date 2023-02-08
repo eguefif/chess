@@ -73,9 +73,8 @@ class MovePieceTest():
 
 
 class BuildMoves:
-    def __init__(self, file_info, file_moves):
-        self._info = file_info
-        self._moves = file_moves
+    def __init__(self, file):
+        self._file = file
         self.data = []
 
     def make_data(self):
@@ -98,10 +97,10 @@ class BuildMoves:
         3-> move type (legal move, ilegal move, kill)
         """
         list_info = []
-        with open(self._info, 'r') as file:
+        with open(self._file, 'r') as file:
             data = file.readlines()
         for line in data:
-            piece, x, y, move_type = line.split(',')
+            piece, x, y, move_type = line.split(',')[:4]
             info = []
             info.append(piece.strip())
             info.append([int(x), int(y)])
@@ -120,11 +119,11 @@ class BuildMoves:
            The second move is from a7 to a6. It is a black move.
         """
         list_moves = []
-        with open(self._moves, 'r') as file:
+        with open(self._file, 'r') as file:
             data = file.readlines()
 
         for line in data:
-            entries = line.split(',')
+            entries = line.split(',')[4:]
             moves = []
             for entry in entries:
                 move = []

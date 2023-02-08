@@ -1,5 +1,5 @@
-from chess.game import Game
-from chess.classes import ChessBoard, Player
+from modules.game import Game
+from modules.classes import ChessBoard, Player
 from classes_test import MovePieceTest, BuildMoves
 import pytest
 import string
@@ -14,7 +14,7 @@ def chessboard():
     return chessboard
 
 
-moves = BuildMoves('./tests/info.txt', './tests/moves.txt')
+moves = BuildMoves('./tests/test_moves.txt')
 moves.make_data()
 @pytest.mark.parametrize('parameters', moves.data)
 def test_move(parameters, chessboard):
