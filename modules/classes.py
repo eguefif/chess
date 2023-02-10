@@ -107,7 +107,6 @@ class ChessBoard:
             self.non_active_set.kill_piece(x_target, y_target)
 
         self.active_set.move_piece(x_current, y_current, x_target, y_target)
-        self.board.draw_empty_position(x_current, y_current)
         self.switch_active_player()
         return "success"
 
@@ -149,34 +148,6 @@ class ChessBoard:
         x_position = letter_position.get(position[0])
         return (x_position, int(position[1]))
 
-    def draw_game(self):
-        self.white_set.draw_pieces(self.board)
-        self.black_set.draw_pieces(self.board)
-        self.board.print()
-
-    def print_interface(self):
-        if platform.system == "windows":
-            os.systen("cls")
-        else:
-            os.system("clear")
-
-        print(""*4, "Chess game")
-        print(f"White: {self.give_white_player_name()}")
-        print(f"Black: {self.give_black_player_name()}")
-
-    def print_dead_pieces(self):
-        print("Dead pieces:")
-        white_dead = self.white_set.return_dead_pieces()
-        black_dead = self.black_set.return_dead_pieces()
-        print("white", end=": ")
-        for piece in white_dead:
-            print(piece, end=' ')
-        print('')
-        print("black", end=": ")
-        for piece in black_dead:
-            print(piece, end=" ")
-        print('')
-
     def check_for_kill(self, x: int, y: int) -> "Piece":
         for subset in self.non_active_set.set:
             for piece in subset:
@@ -188,15 +159,39 @@ class ChessBoard:
                 if piece.x == x and piece.y == y:
                     return piece
 
-    def give_white_player_name(self) -> None:
+    def get_boardgame(self):
+        boardgame = [['' for i in range(9)] for a in range(9)]
+        for subset in self.white_set.set:
+            for piece in subset:
+                x, y = piece.get_position_for_board()
+                if piece.alive == 0:
+                    break
+                boardgame[y][x] = piece.name + 'a'
+        for subset in self.black_set.set:
+            for piece in subset:
+                x, y = piece.get_position_for_board()
+                if piece.alive == 0:
+                    break
+                boardgame[y][x] = piece.name + 'b'
+        return boardgame
+
+    def get_players(self) -> (str, str):
+        return self.give_white_player_name(), self.give_black_player_name()
+
+    def get_dead_pieces(self) -> (list, list):
+        white_dead_pieces = self.white_set.return_dead_pieces()
+        black_dead_pieces = self.black_set.return_dead_pieces()
+        return white_dead_pieces, black_dead_pieces
+
+    def give_white_player_name(self) -> str:
         if self.player1.color == "white":
             return self.player1.name
         return self.player2.name
 
-    def give_black_player_name(self) -> None:
-        if self.player1.color == "black":
-            return self.player1.name
-        return self.player2.name
+    def give_black_player_name(self) -> str:
+        if self.player1.color == "white":
+            return self.player2.name
+        return self.player1.name
 
     def get_piece_by_position(self, x, y):
         for subset in self.white_set.set:
@@ -242,6 +237,8 @@ class Set():
                        for piece in subset if piece.alive == 0]
         return dead_pieces
 
+
+
     def draw_pieces(self, board: "Board") -> None:
         for pieces in self.set:
             for piece in pieces:
@@ -262,9 +259,8 @@ class Piece:
         self.color = color
         self.alive = 1
 
-    def draw(self, board: "Board") -> None:
-        if self.alive == 1:
-            board.draw_piece(self.x, self.y, self.name, self.color)
+    def get_position_for_board(self):
+        return self.x-1, self.y-1
 
     def is_move_possible(self, x: int, y: int) -> bool:
         pass
@@ -299,17 +295,17 @@ class Pawn(Piece):
         else:
             y_direction = 1
         if self.y+y_direction*1 in range(9):
-            if board[self.x-1][self.y-1+1*y_direction] == 0:
+            if super().check_board(x, y, board) == 0:
                 possible_move.append((self.x, self.y+y_direction*1))
         if self.y+y_direction*2 in range(9) and self.first_move == 1:
-            if board[self.x-1][self.y-1+y_direction*2] == 0:
+            if super().check_board(x, y, board) == 0:
                 self.first_move = 0
                 possible_move.append((self.x, self.y+y_direction*2))
         if self.x+1 in range(9) and self.y+y_direction*1 in range(9):
-            if board[self.x-1+1][self.y-1+y_direction*1] == 2:
+            if super().check_board(x, y, board) != 1:
                 possible_move.append((self.x+1, self.y+y_direction*1))
         if self.x-1 in range(9) and self.y+y_direction*1 in range(9):
-            if board[self.x-1-1][self.y-1+y_direction*1] == 2:
+            if super().check_board(x, y, board) != 1:
                 possible_move.append((self.x-1, self.y+y_direction*1))
 
         if (x, y) in possible_move:
@@ -374,23 +370,22 @@ class Bishop(Piece):
             return False
         if self.x - x > 0 and self.y - y > 0:
             for x_check, y_check in zip(range(self.x-1, x, -1), range(self.y-1, y, -1)):
-                    if board[x_check-1][y_check-1] != 0:
+                    if super().check_board(x, y, board) != 0:
                         return False
         if self.x - x < 0 and self.y - y > 0:
             for x_check, y_check in zip(range(self.x+1, x), range(self.y-1, y, -1)):
-                if board[x_check-1][y_check-1] != 0:
+                if super().check_board(x, y, board) != 0:
                     return False
         if self.x - x < 0 and self.y - y < 0:
             for x_check, y_check in zip(range(self.x+1, x), range(self.y+1, y)):
-                if board[x_check-1][y_check-1] != 0:
+                if super().check_board(x, y, board) != 0:
                     return False
         if self.x - x > 0 and self.y - y < 0:
             for x_check, y_check in zip(range(self.x-1, x, -1), range(self.y+1, y)):
-                if board[x_check][y_check] != 0:
-                    print('test')
+                if super().check_board() != 0:
                     return False
 
-        if board[x-1][y-1] == 1:
+        if super().check_board(x, y, board) == 1:
             return False
         return "success"
 
@@ -418,7 +413,7 @@ class Knight(Piece):
                           (self.x+2, self.y-1),
                           (self.x+1, self.y-2),
                           ]
-        if board[x-1][y-1] == 1:
+        if super().check_board(x, y, board) == 1:
             print('test')
             return "failed"
         if (x, y) not in possible_moves:
@@ -464,23 +459,22 @@ class Queen(Piece):
         if abs(self.x - x) == abs(self.y - y):
             if self.x - x > 0 and self.y - y > 0:
                 for x_check, y_check in zip(range(self.x-1, x, -1), range(self.y-1, y, -1)):
-                        if board[x_check-1][y_check-1] != 0:
+                        if super().check_board(x, y, board) != 0:
                             return False
             if self.x - x < 0 and self.y - y > 0:
                 for x_check, y_check in zip(range(self.x+1, x), range(self.y-1, y, -1)):
-                    if board[x_check-1][y_check-1] != 0:
+                    if super().check_board(x, y, board) != 0:
                         return False
             if self.x - x < 0 and self.y - y < 0:
                 for x_check, y_check in zip(range(self.x+1, x), range(self.y+1, y)):
-                    if board[x_check-1][y_check-1] != 0:
+                    if super().check_board() != 0:
                         return False
             if self.x - x > 0 and self.y - y < 0:
                 for x_check, y_check in zip(range(self.x-1, x, -1), range(self.y+1, y)):
-                    if board[x_check][y_check] != 0:
-                        print('test')
+                    if super().check_board(x, y, board) != 0:
                         return False
 
-        if board[x-1][y-1] == 1:
+        if super().check_board(x, y, board) == 1:
             return False
         return "success"
 
@@ -511,7 +505,7 @@ class King(Piece):
         if (x, y) not in possible_move:
             return False
 
-        if board[x-1][y-1] == 1:
+        if super().check_board(x, y, board) == 1:
             return False
         return "success"
 
@@ -543,10 +537,9 @@ class Board():
             piece = colored(piece, 'blue')
         else:
             piece = piece
-        self.draw(x, y, piece)
+        self._draw(x, y, piece)
 
-    def draw_empty_position(self, x: int, y: int) -> None:
-        self.draw(x, y, ' ')
-
-    def draw(self, x: int, y: int, value: str) -> None:
-        self.board[y+1][x*2] = value
+    def _draw(self, x: int, y: int, value: str) -> None:
+        y_modified = y + 2
+        x_modified = (x + 1)*2
+        self.board[y_modified][x_modified] = value

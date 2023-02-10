@@ -1,4 +1,5 @@
 from modules.classes import ChessBoard, Player
+from modules.terminal_graphic import TerminalGraphic
 import random
 
 
@@ -9,6 +10,7 @@ class Game():
         self.player1_name: str
         self.player2_name: str
         self.chessboard: ChessBoard
+        self.graphic = TerminalGraphic()
 
     def check_player1_name(self, player1: str) -> bool:
         if len(player1) > 20:
@@ -41,12 +43,15 @@ class Game():
 
     def launch_game(self):
         while True:
-            self.chessboard.print_interface()
-            self.chessboard.draw_game()
-            self.chessboard.print_dead_pieces()
+            white_dead_pieces, black_dead_pieces = self.chessboard.get_dead_pieces()
+            boardgame = self.chessboard.get_boardgame()
+            player1, player2 = self.chessboard.get_players()
+            self.graphic.print_interface(player1, player2)
+            self.graphic.print_game(boardgame)
+            self.graphic.print_dead_pieces(white_dead_pieces, black_dead_pieces)
 
             while True:
-                print(f"{self.chessboard.active_player.name}, it's your turn.")
+                print(f"\n{self.chessboard.active_player.name}, it's your turn.")
                 current_position = input("Piece to move:  ")
                 target_position = input("To: ")
                 if (self.chessboard.check_move_format(target_position) and
@@ -69,3 +74,4 @@ class Game():
             if move_state == "mate":
                 break
         print(f"The game is over, {self.chessboard.active_player.name} won.")
+

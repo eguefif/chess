@@ -1,5 +1,5 @@
 # chess
-Chess game in a terminal.
+A terminal based chess game.
 
 ## Description
 This project's goal is to practice and learn object oriented programming.

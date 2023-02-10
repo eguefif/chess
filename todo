@@ -1,5 +1,8 @@
 # Next todo :
-- test bishop: kill and illegal moves
+-Game has to be used by different kind of interfaces and do the terminal version. Someone has to be able to use it for a GUI version.
+-Implement castling
+-Implement check
+-Write test before castling and check
 
 # Todo list:
 ## Change in design
@@ -30,3 +33,5 @@ Do the is_check_mate function return boo
    IN PROCESS Move a piece and check if :
         the move is possible (the player is not checked, inside the board and not on a friendly piece)
    DONE Think about how to print dead pieces
+   DONE -Rewrite for each piece when we check the board, use the super().check_board() method
+   DONE -redesign the graphic. It has to be call by the game classe. Game classe has to be an interface.

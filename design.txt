@@ -1,0 +1,14 @@
+Design and architecture
+
+Design Choices
+
+#Piece movement check
+For each piece, we build a mask of the board with: 0 for empty cell, 1 for ally and 2 for foe.
+Queen: uses the rook and bishop test.
+King, pawn and horse: calculate every possibility in a list and check if the required move is in int.
+Rool and Bishop: 
+check if move is legal:
+   Bishop: absolute value of current x and target x equal absolute value for current y - target y, it is legal.
+   Example: 5,4 => 7,6      7-5 = 2 and 6-4 = 2
+   Rook: we test vertical movement, one of the subtraction between current and target x or y is 0.
+
