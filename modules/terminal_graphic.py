@@ -2,6 +2,7 @@ import os
 import platform
 from modules.classes import Board
 
+
 class TerminalGraphic():
     def __init__(self):
         self.board = Board()
@@ -16,11 +17,12 @@ class TerminalGraphic():
         print(f"white: {player1}")
         print(f"black: {player2}")
 
-    def print_game(self, boardgame):
+    def print_game(self, boardgame: list[list[str]]) -> None:
         for y, row in enumerate(boardgame):
             for x, cell in enumerate(row):
-                if len(cell) < 1 :
-                    break
+                if len(cell) < 1:
+                    self.board.draw_empty_cell(x, y)
+                    continue
                 name = self._give_name(cell)
                 if 'b' in cell:
                     self.board.draw_piece(x, y, name, 'black')
@@ -31,7 +33,11 @@ class TerminalGraphic():
     def _give_name(self, cell: str) -> str:
         return cell[0]
 
-    def print_dead_pieces(self, white_pieces, black_pieces):
+    def print_dead_pieces(
+             self,
+            white_pieces: list[str],
+            black_pieces: list[str]
+            ) -> None:
         print("Dead pieces:")
         print("White: ", end='')
         for piece in white_pieces:

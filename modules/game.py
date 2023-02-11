@@ -48,20 +48,28 @@ class Game():
             player1, player2 = self.chessboard.get_players()
             self.graphic.print_interface(player1, player2)
             self.graphic.print_game(boardgame)
-            self.graphic.print_dead_pieces(white_dead_pieces, black_dead_pieces)
+            self.graphic.print_dead_pieces(
+                    white_dead_pieces,
+                    black_dead_pieces)
 
             while True:
-                print(f"\n{self.chessboard.active_player.name}, it's your turn.")
-                current_position = input("Piece to move:  ")
-                target_position = input("To: ")
-                if (self.chessboard.check_move_format(target_position) and
-                    self.chessboard.check_move_format(current_position)):
+                print(
+                    f"\n{self.chessboard.active_player.name}, "
+                    "it's your turn.")
+                current_position = input("Piece to move position :")
+                target_position = input("Target position: ")
+                while not (self.chessboard.check_move_format(target_position)
+                           and
+                           self.chessboard.check_move_format(
+                               current_position)):
+                    current_position = input("Piece to move position :")
+                    target_position = input("Target position: ")
 
-                    x_current, y_current = self.chessboard.get_xy_position(
+                x_current, y_current = self.chessboard.get_xy_position(
                             current_position)
-                    x_target, y_target = self.chessboard.get_xy_position(
+                x_target, y_target = self.chessboard.get_xy_position(
                             target_position)
-                    move_state = self.chessboard.move_piece(
+                move_state = self.chessboard.move_piece(
                             x_current,
                             y_current,
                             x_target,
@@ -74,4 +82,3 @@ class Game():
             if move_state == "mate":
                 break
         print(f"The game is over, {self.chessboard.active_player.name} won.")
-
