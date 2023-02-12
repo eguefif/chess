@@ -13,6 +13,10 @@ def chessboard():
     return chessboard
 
 
+# Test check
+
+
+
 # Test castling
 castle_tests = [
         ['g1', 'f1', ['e2e3', 'e7e6', 'f1e2', 'f8e7', 'g1f3', 'g8f6', 'e1g1']],

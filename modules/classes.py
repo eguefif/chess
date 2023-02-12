@@ -3,18 +3,27 @@ import string
 
 
 class ChessBoard:
-    def __init__(self, player1: "Player", player2: "Player") -> None:
+    def __init__(
+            self,
+            player1: "Player",
+            player2: "Player",
+            white_set: "Set" = None,
+            black_set: "Set" = None,
+            active_player: int = None,
+            ) -> None:
         self.player1 = player1
         self.player2 = player2
-        self.white_set = Set("white")
-        self.black_set = Set("black")
-        self.board = Board()
+        if white_set is not None:
+            self.white_set = white_set
+            self.black_set = black_set
+        else:
+            self.white_set = Set("white")
+            self.black_set = Set("black")
         if self.player1.color == "white":
             self.active_player = self.player1
         else:
             self.active_player = self.player2
-        self.active_set = self.white_set
-        self.non_active_set = self.black_set
+        self.set_active_set()
 
     def set_active_set(self) -> None:
         if self.active_player.color == "white":
@@ -72,13 +81,14 @@ class ChessBoard:
                    y_target: int,
                    ) -> str:
         self.set_active_set()
+        print(repr(self.active_set))
 
         piece = self.get_piece_if_alive(x_current, y_current)
         if piece is None:
             print("There is no piece.")
             return 'failed'
 
-        if self.active_player.check is True:
+        if self.active_player.check:
             if piece.p != "Z":
                 print("Your king is in check, move it.")
                 return 'failed'
@@ -91,6 +101,7 @@ class ChessBoard:
 
         if move_state == 'castling':
             self.castling(x_current, y_current, x_target, y_target)
+            self.switch_active_player()
             return "success"
 
         if self.is_target_ally(x_target, y_target):
@@ -215,7 +226,11 @@ class ChessBoard:
 
 
 class Set():
-    def __init__(self, color) -> None:
+    def __init__(self, color: str, list_pieces: dict = None) -> None:
+        if list_pieces is not None:
+            self.init_from_dict(list_pieces, color)
+            return
+        self.color = color
         self.paws = [Pawn(color, a) for a in range(1, 9)]
         self.rooks = [Rook(color, a) for a in range(2)]
         self.bishops = [Bishop(color, a) for a in range(2)]
@@ -229,6 +244,41 @@ class Set():
                     self.queen,
                     self.king,
                     ]
+
+    def init_from_dict(self, list_pieces: dict, color: str) -> None:
+        '''
+        This function define a set from a dictinnary.
+        Each entry has a name after a piece with a list of coordinate.
+        '''
+
+        self.pawns = []
+        self.knights = []
+        self.bishops = []
+        self.rooks = []
+        self.queen = []
+        self.king = []
+        for key, entry in list_pieces.items():
+            match key:
+                case 'pawn':
+                    for position in entry:
+                        pawn = Pawn(color, position[0], position[1])
+                        self.pawns.append(pawn)
+                case 'bishop':
+                    for position in entry:
+                        bishop = Bishop(color, position[0], position[1])
+                        self.bishops(bishop)
+                case 'knight':
+                    for position in entry:
+                        knight = Knight(color, position[0], position[1])
+                        self.knights.append(knight)
+                case 'rook':
+                    for position in entry:
+                        rook = Rook(color, position[0], position[1])
+                        self.rook.append(rook)
+                case 'queen':
+                    self.queen.append(Queen(color, position[0], position[1]))
+                case 'king':
+                    self.king.append(King(color, position[0], position[1]))
 
     def move_piece(self, x, y, x_target, y_target):
         for subset in self.set:
@@ -255,18 +305,29 @@ class Set():
                     break
                 piece.draw(board)
 
+    def __repr__(self):
+        return f'{self.color} set.'
+
 
 class Piece:
     x: int
     y: int
     name: str
 
-    def check_board(self, x: int, y: int, board: [int, int]) -> int:
-        return board[x-1][y-1]
-
-    def __init__(self, color: str) -> None:
+    def __init__(
+            self,
+            color: str,
+            x: int = 0,
+            y: int = 0,
+            ) -> None:
         self.color = color
         self.alive = 1
+        if x != 0:
+            self.x = x
+            self.y = y
+
+    def check_board(self, x: int, y: int, board: [int, int]) -> int:
+        return board[x-1][y-1]
 
     def get_position_for_board(self):
         return self.x-1, self.y-1
@@ -287,9 +348,19 @@ class Player:
 
 
 class Pawn(Piece):
-    def __init__(self, color: str, position: int) -> None:
-        super().__init__(color)
+    def __init__(
+            self,
+            color: str,
+            position: int = 0,
+            x: int = 0,
+            y: int = 0,
+            ) -> None:
         self.name = 'p'
+        self.first_move = 0
+        if x != 0:
+            super().__init__(color, x, y)
+            return
+        super().__init__(color)
         self.x = position
         self.first_move = 1
         if color == "black":
@@ -324,9 +395,18 @@ class Pawn(Piece):
 
 
 class Rook(Piece):
-    def __init__(self, color: str, position: int) -> None:
-        super().__init__(color)
+    def __init__(
+            self,
+            color: str,
+            position: int = 0,
+            x: int = 0,
+            y: int = 0,
+            ) -> None:
         self.name = 'R'
+        if x != 0:
+            super().__init__(color, x, y)
+            return
+        super().__init__(color)
         if position == 0:
             self.x = 1
         else:
@@ -362,7 +442,17 @@ class Rook(Piece):
 
 
 class Bishop(Piece):
-    def __init__(self, color: str, position: int) -> None:
+    def __init__(
+            self,
+            color: str,
+            position: int = 0,
+            x: int = 0,
+            y: int = 0,
+            ) -> None:
+        self.name = 'B'
+        if x != 0:
+            super().__init__(color, x, y)
+            return
         super().__init__(color)
         self.name = 'B'
         if position == 0:
@@ -408,7 +498,17 @@ class Bishop(Piece):
 
 
 class Knight(Piece):
-    def __init__(self, color: str, position: int) -> None:
+    def __init__(
+            self,
+            color: str,
+            position: int = 0,
+            x: int = 0,
+            y: int = 0,
+            ) -> None:
+        self.name = 'K'
+        if x != 0:
+            super().__init__(color, x, y)
+            return
         super().__init__(color)
         self.name = 'K'
         if position == 0:
@@ -442,7 +542,17 @@ class Knight(Piece):
 
 
 class Queen(Piece):
-    def __init__(self, color: str) -> None:
+    def __init__(
+            self,
+            color: str,
+            position: int = 0,
+            x: int = 0,
+            y: int = 0,
+            ) -> None:
+        self.name = 'Q'
+        if x != 0:
+            super().__init__(color, x, y)
+            return
         super().__init__(color)
         self.name = 'Q'
         self.x = 4
@@ -505,7 +615,18 @@ class Queen(Piece):
 
 
 class King(Piece):
-    def __init__(self, color: str, ) -> None:
+    def __init__(
+            self,
+            color: str,
+            position: int = 0,
+            x: int = 0,
+            y: int = 0,
+            ) -> None:
+        self.name = 'Z'
+        self.first_move = 0
+        if x != 0:
+            super().__init__(color, x, y)
+            return
         super().__init__(color)
         self.x = 5
         self.name = 'Z'
@@ -556,6 +677,18 @@ class King(Piece):
 
 class Board():
     def __init__(self) -> None:
+        self.board1 = [['  a b c d e f g h'],
+                      ['-----------------'],
+                      ['1| | | | | | | | |'],
+                      ['2| | | | | | | | |'],
+                      ['3| | | | | | | | |'],
+                      ['4| | | | | | | | |'],
+                      ['5| | | | | | | | |'],
+                      ['6| | | | | | | | |'],
+                      ['7| | | | | | | | |'],
+                      ['8| | | | | | | | |'],
+                      ['------------------'],
+                      ['  a b c d e f g h']]
         self.board = [['  ', 'a', ' ', 'b', ' ', 'c', ' ', 'd', ' ', 'e', ' ', 'f', ' ', 'g', ' ', 'h'],
                       ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',],
                       ['1', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', '1'],
