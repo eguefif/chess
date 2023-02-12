@@ -16,8 +16,8 @@ bin/pytest: bin/pip
 test:	install bin/pytest
 	bin/pytest -sv tests/tests.py
 
-format:
+format:	bin/pytest
 	bin/black chess/
 
-lint:
+lint:	bin/pytest
 	bin/flake8 chess/
