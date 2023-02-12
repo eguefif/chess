@@ -1,4 +1,4 @@
-from modules.game import Game
+from chess.game import Game
 
 game = Game()
 
