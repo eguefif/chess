@@ -3,7 +3,7 @@ import platform
 from chess.classes import Board
 
 
-class TerminalGraphic():
+class TerminalGraphic:
     def __init__(self):
         self.board = Board()
 
@@ -13,7 +13,7 @@ class TerminalGraphic():
         else:
             os.system("clear")
 
-        print(""*4, "Chess game")
+        print("" * 4, "Chess game")
         print(f"white: {player1}")
         print(f"black: {player2}")
 
@@ -24,22 +24,20 @@ class TerminalGraphic():
                     self.board.draw_empty_cell(x, y)
                     continue
                 name = self._give_name(cell)
-                if 'b' in cell:
-                    self.board.draw_piece(x, y, name, 'black')
+                if "b" in cell:
+                    self.board.draw_piece(x, y, name, "black")
                 else:
-                    self.board.draw_piece(x, y, name, 'white')
+                    self.board.draw_piece(x, y, name, "white")
         self.board.print()
 
     def _give_name(self, cell: str) -> str:
         return cell[0]
 
     def print_dead_pieces(
-             self,
-            white_pieces: list[str],
-            black_pieces: list[str]
-            ) -> None:
+        self, white_pieces: list[str], black_pieces: list[str]
+    ) -> None:
         print("Dead pieces:")
-        print("White: ", end='')
+        print("White: ", end="")
         for piece in white_pieces:
             print(piece, end="")
         print()
