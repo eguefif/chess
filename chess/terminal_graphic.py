@@ -1,6 +1,6 @@
 import os
 import platform
-from modules.classes import Board
+from chess.classes import Board
 
 
 class TerminalGraphic():

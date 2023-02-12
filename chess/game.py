@@ -1,5 +1,5 @@
-from modules.classes import ChessBoard, Player
-from modules.terminal_graphic import TerminalGraphic
+from chess.classes import ChessBoard, Player
+from chess.terminal_graphic import TerminalGraphic
 import random
 
 
