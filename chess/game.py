@@ -3,7 +3,7 @@ from chess.terminal_graphic import TerminalGraphic
 import random
 
 
-class Game():
+class Game:
     def __init__(self) -> None:
         self.player1: Player
         self.player2: Player
@@ -48,33 +48,27 @@ class Game():
             player1, player2 = self.chessboard.get_players()
             self.graphic.print_interface(player1, player2)
             self.graphic.print_game(boardgame)
-            self.graphic.print_dead_pieces(
-                    white_dead_pieces,
-                    black_dead_pieces)
+            self.graphic.print_dead_pieces(white_dead_pieces, black_dead_pieces)
 
             while True:
-                print(
-                    f"\n{self.chessboard.active_player.name}, "
-                    "it's your turn.")
+                print(f"\n{self.chessboard.active_player.name}, " "it's your turn.")
                 current_position = input("Piece to move position :")
                 target_position = input("Target position: ")
-                while not (self.chessboard.check_move_format(target_position)
-                           and
-                           self.chessboard.check_move_format(
-                               current_position)):
+                while not (
+                    self.chessboard.check_move_format(target_position)
+                    and self.chessboard.check_move_format(current_position)
+                ):
                     current_position = input("Piece to move position :")
                     target_position = input("Target position: ")
 
-                x_current, y_current = self.chessboard.get_xy_position(
-                            current_position)
-                x_target, y_target = self.chessboard.get_xy_position(
-                            target_position)
+                x_current, y_current = self.chessboard.get_xy_position(current_position)
+                x_target, y_target = self.chessboard.get_xy_position(target_position)
                 move_state = self.chessboard.move_piece(
-                            x_current,
-                            y_current,
-                            x_target,
-                            y_target,
-                            )
+                    x_current,
+                    y_current,
+                    x_target,
+                    y_target,
+                )
                 if move_state in ["success", "mate", "check"]:
                     input("Push any key to refresh.")
                     break

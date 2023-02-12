@@ -18,3 +18,6 @@ test:	install bin/pytest
 
 format:
 	bin/black chess/
+
+lint:
+	bin/flake8 chess/
