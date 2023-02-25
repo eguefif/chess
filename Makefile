@@ -14,4 +14,4 @@ bin/pytest: bin/pip
 	bin/pip install -e .
 
 test:	install bin/pytest
-	bin/pytest -sv tests/tests.py
+	bin/pytest tests/tests.py

@@ -1,0 +1,6 @@
+board1
+black:pawn,a7;bishop,e3;knight,g5;queen,h3;king:e6;rook:a7
+white:
+board2
+
+

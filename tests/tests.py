@@ -13,9 +13,46 @@ def chessboard():
     return chessboard
 
 
+@pytest.fixture
+def players():
+    player1 = Player("Raji", "white")
+    player2 = Player("Roger", "black")
+    return player1, player2
+
 # Test check
+check_test = [[
+        {'queen': '27'},
+        {'king': '58'},
+        'b7',
+        'b8',
+        'white'],
+        [
+        {'king': '54'},
+        {'rook': ['76']},
+        'g6',
+        'g4',
+        'black'],
+        ]
 
-
+@pytest.mark.parametrize('check_test', check_test)
+def test_check(players, check_test):
+    cb = ChessBoard.init_from_dict(
+            players[0],
+            players[1],
+            check_test[0],
+            check_test[1],
+            check_test[4])
+    x_current, y_current = cb.get_xy_position(check_test[2])
+    x_target, y_target = cb.get_xy_position(check_test[3])
+    result = cb.move_piece(
+            x_current,
+            y_current,
+            x_target,
+            y_target,)
+    foe_set = cb.active_set
+    board = cb.get_board_with_pieces()
+    king = cb.non_active_set.get_king()
+    assert king.is_check(foe_set, board) == True 
 
 # Test castling
 castle_tests = [

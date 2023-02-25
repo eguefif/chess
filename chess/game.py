@@ -57,13 +57,13 @@ class Game():
                     f"\n{self.chessboard.active_player.name}, "
                     "it's your turn.")
                 current_position = input("Piece to move position :")
+                while not self.chessboard.check_move_format(current_position):
+                        current_position = input(
+                            "Enter a valid position for piece to move:")
                 target_position = input("Target position: ")
-                while not (self.chessboard.check_move_format(target_position)
-                           and
-                           self.chessboard.check_move_format(
-                               current_position)):
-                    current_position = input("Piece to move position :")
-                    target_position = input("Target position: ")
+                while not self.chessboard.check_move_format(target_position):
+                        target_position = input(
+                            "Enter a valid position for target position:")
 
                 x_current, y_current = self.chessboard.get_xy_position(
                             current_position)

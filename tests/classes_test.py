@@ -26,21 +26,19 @@ class MovePieceTest():
         starting_piece = self._chessboard.get_piece_by_position(
                 self._piece_x,
                 self._piece_y)
-        print(self._piece_x, self._piece_y, id(starting_piece))
         for move in self._moves:
             x_current, y_current = self._chessboard.get_xy_position(move[0])
             x_target, y_target = self._chessboard.get_xy_position(move[1])
+            print(f'Move from {x_current}{y_current} to {x_target}{y_target}')
             move_state = self._chessboard.move_piece(
                     x_current,
                     y_current,
                     x_target,
                     y_target,
                     )
-            print(f'Move from {x_current}{y_current} to {x_target}{y_target}')
             ending_piece = self._chessboard.get_piece_by_position(
                     x_target,
                     y_target)
-        print(x_target, y_target, id(ending_piece))
         return (move_state == "success" and
                 id(starting_piece) == id(ending_piece))
 
@@ -132,3 +130,10 @@ class BuildMoves:
                 moves.append(move)
             list_moves.append(moves)
         return list_moves
+"""
+class MakeBoards():
+    def __init__(self, file):
+        self.file = file
+
+    def make_boards
+"""

@@ -37,6 +37,6 @@ queen,4,8,kill,d2d4,d7d5,d1d3,d8d6,d3f5,d6a6,f5f6,a6a2
 queen,4,5,illegal_move,d1d4
 queen,4,1,illegal_move,d2d4,d7d6,d1d3,d8d6,d3g6,a7a6,g6b6
 queen,4,8,illegal_move,d2d4,d7d6,d3a6,d8d6,a6c6,d6a6
-king,5,1,legal_move,e2e4,e7e5,e1e2,e8e7,e2e3,e7e6,e3f3,e6f6,f3f4,f6f5,f4f3,f5f4,f3e2,f4g5,e2d3,g5h6,d3c3
+king,5,1,legal_move,e2e4,e7e5,e1e2,e8e7,e2e3,e7e6,e3f3,e6f6,f3e3,f6e6,e3e2,e6e7,e2e1
 king,5,1,illegal_move,e2e4,e7e5,e1e2,e8e7,e2e3,e7e6,e3f3,e6f6,f3f4,f6f5,f5e4
 king,5,8,illegal_move,e2e4,e7e5,e1e2,e8e7,e2e3,e7e6,e3f3,e6f6,f3f4,f6e5
